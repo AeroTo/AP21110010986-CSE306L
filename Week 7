@@ -1,0 +1,218 @@
+[25-10-2023 09:22 AM] Srinivas: /*1. Implement non-recursive Predictive Parser for the grammar
+
+S -> aBa
+B -> bB | ε
+  */
+
+#include<stdio.h>
+#include<conio.h>
+#include<stdlib.h>
+#include<string.h>
+int i=0,top=0;
+char stack[20],ip[20];
+
+void push(char c)
+{
+	if (top>=20)
+		printf("Stack Overflow");
+	else
+		stack[top++]=c;
+}
+
+void pop(void)
+{
+	if(top<0)
+		printf("Stack underflow");
+	else
+		top--;
+}
+
+void error(void)
+{
+printf("\n\nSyntax Error!!!! String is invalid\n");
+getch();
+exit(0);
+}
+
+int main()
+{
+int n;
+
+printf("The given grammar is\n\n");
+printf("S -> aBa\n");
+printf("B -> bB | epsilon \n\n");
+printf("Enter the string to be parsed:\n");
+scanf("%s",ip);
+n=strlen(ip);
+ip[n]='$';
+ip[n+1]='\0';
+push('$');
+push('S');
+while(ip[i]!='\0')
+{ if(ip[i]=='$' && stack[top-1]=='$')
+  {
+	printf("\n\n Successful parsing of string \n");
+	return(1);
+  }
+  else
+	if(ip[i]==stack[top-1])
+	{
+	   printf("\nmatch of %c occured ",ip[i]);
+	   i++;pop();
+	}
+	else
+	{
+		if(stack[top-1]=='S' && ip[i]=='a')
+		{
+		       printf(" \n S ->aBa");
+		       pop();
+		       push('a');
+ 		       push('B');
+               push('a');
+		}
+		else
+		if(stack[top-1]=='B' && ip[i]=='b')
+		{
+			printf("\n B ->bB");
+			pop();push('B');push('b');
+		}
+		     else
+		       if(stack[top-1]=='B' && ip[i]=='a')
+		       {
+			printf("\n B -> epsilon");
+			pop();
+		       }
+		       else
+			error();
+	}
+ }
+}
+[25-10-2023 09:22 AM] Srinivas: #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int i = 0;
+char stack[20];
+char ip[20];
+
+void push(char c) {
+    stack[i++] = c;
+}
+
+void pop() {
+    i--;
+}
+
+void error() {
+    printf("\n\nSyntax Error!!!! String is invalid\n");
+    exit(0);
+}
+
+int main() {
+    int n;
+
+    printf("The given grammar is\n\n");
+    printf("E  -> TE'\n");
+    printf("E' -> +TE' | epsilon\n");
+    printf("T  -> FT'\n");
+    printf("T' -> *FT' | epsilon\n");
+    printf("F  -> (E) | d\n\n");
+
+    printf("Enter the string to be parsed:\n");
+    scanf("%s", ip);
+    n = strlen(ip);
+    ip[n] = '$';
+    ip[n + 1] = '\0';
+
+    push('$');
+    push('E');
+
+    while (1) {
+        if (ip[i] == '$' && stack[i] == '$') {
+            printf("\n\nSuccessful parsing of string\n");
+            break;
+        } else if (ip[i] == stack[i]) {
+            printf("\nMatch of %c occurred ", ip[i]);
+            i++;
+            pop();
+        } else {
+            switch (stack[i]) {
+                case 'E':
+                    if (ip[i] == 'd' || ip[i] == '(') {
+                        printf("\nE -> TE'");
+                        pop();
+                        push('E');
+                        push('\'');
+                        push('T');
+                    } else {
+                        error();
+                    }
+                    break;
+
+                case 'E' - 1:
+                    if (ip[i] == '+') {
+                        printf("\nE' -> +TE'");
+                        pop();
+                        push('E');
+                        push('\'');
+                        push('T');
+                        push('+');
+                    } else if (ip[i] == ')' || ip[i] == '$') {
+                        printf("\nE' -> epsilon");
+                        pop();
+                    } else {
+                        error();
+                    }
+                    break;
+
+                case 'T':
+                    if (ip[i] == 'd' || ip[i] == '(') {
+                        printf("\nT -> FT'");
+                        pop();
+                        push('T');
+                        push('\'');
+                        push('F');
+                    } else {
+                        error();
+                    }
+                    break;
+
+                case 'T' - 1:
+                    if (ip[i] == '*') {
+                        printf("\nT' -> *FT'");
+                        pop();
+                        push('T');
+                        push('\'');
+                        push('F');
+                        push('*');
+                    } else if (ip[i] == '+' || ip[i] == ')' || ip[i] == '$') {
+                        printf("\nT' -> epsilon");
+                        pop();
+                    } else {
+                        error();
+                    }
+                    break;
+
+                case 'F':
+                    if (ip[i] == 'd') {
+                        printf("\nF -> d");
+                        pop();
+                        push('d');
+                    } else if (ip[i] == '(') {
+                        printf("\nF -> (E)");
+                        pop();
+                        push(')');
+                        push('E');
+                        push('(');
+                    } else {
+                        error();
+                    }
+                    break;
+
+                default:
+                    error();
+            }
+        }
+    }
+    return 0;
+}
